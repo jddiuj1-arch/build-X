@@ -101,6 +101,14 @@ const SideMenu = ({ userType, email, name, userPoints, onClose, navigation }) =>
       }
     },
     {
+      icon: 'settings-outline',
+      title: 'إعدادات API',
+      onPress: () => {
+        onClose();
+        navigation.navigate('APISettings');
+      }
+    },
+    {
       icon: 'moon-outline',
       title: 'المظهر',
       subtitle: 'اتباع النظام',

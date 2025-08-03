@@ -142,6 +142,17 @@ const APISettingsScreen = ({ navigation }) => {
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           {/* Header */}
           <View style={styles.header}>
+            <View style={styles.headerTop}>
+              <Button 
+                mode="text" 
+                onPress={() => navigation.goBack()}
+                icon="arrow-right"
+                style={styles.backButton}
+                labelStyle={styles.backButtonText}
+              >
+                العودة
+              </Button>
+            </View>
             <Icon name="api" size={40} color="#2196F3" />
             <Text style={styles.title}>إعدادات API الذكاء الاصطناعي</Text>
             <Text style={styles.subtitle}>
@@ -341,6 +352,18 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     marginBottom: 24,
+  },
+  headerTop: {
+    width: '100%',
+    alignItems: 'flex-start',
+    marginBottom: 16,
+  },
+  backButton: {
+    alignSelf: 'flex-start',
+  },
+  backButtonText: {
+    fontSize: 16,
+    color: '#2196F3',
   },
   title: {
     fontSize: 24,

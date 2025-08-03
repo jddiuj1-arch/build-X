@@ -19,14 +19,6 @@ const AdBanner = () => {
   const ads = [
     {
       id: 1,
-      title: 'احصل على Manus Pro',
-      description: 'استمتع بميزات متقدمة وإجابات أسرع',
-      buttonText: 'ترقية الآن',
-      color: '#4CAF50',
-      icon: 'star',
-    },
-    {
-      id: 2,
       title: 'دعوة الأصدقاء',
       description: 'احصل على نقاط مجانية عند دعوة أصدقائك',
       buttonText: 'دعوة',
@@ -34,12 +26,20 @@ const AdBanner = () => {
       icon: 'people',
     },
     {
-      id: 3,
+      id: 2,
       title: 'ميزة جديدة!',
       description: 'جرب مساعد الكود الجديد للبرمجة',
       buttonText: 'جرب الآن',
       color: '#FF9800',
       icon: 'code-slash',
+    },
+    {
+      id: 3,
+      title: 'تحليل الصور',
+      description: 'ارفع صورة واحصل على تحليل ذكي فوري',
+      buttonText: 'جرب الآن',
+      color: '#9C27B0',
+      icon: 'camera',
     },
   ];
 

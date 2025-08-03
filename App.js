@@ -11,6 +11,7 @@ import RegisterScreen from './src/screens/RegisterScreen';
 import MainScreen from './src/screens/MainScreen';
 import ChatScreen from './src/screens/ChatScreenNew';
 import APISettingsScreen from './src/screens/APISettingsScreen';
+import UpgradeScreen from './src/screens/UpgradeScreen';
 
 // Enable RTL for Arabic
 I18nManager.allowRTL(true);
@@ -44,6 +45,7 @@ export default function App() {
           <Stack.Screen name="Main" component={MainScreen} />
           <Stack.Screen name="Chat" component={ChatScreen} />
           <Stack.Screen name="APISettings" component={APISettingsScreen} />
+          <Stack.Screen name="Upgrade" component={UpgradeScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </PaperProvider>

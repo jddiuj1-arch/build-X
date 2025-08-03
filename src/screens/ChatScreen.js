@@ -38,7 +38,7 @@ const ChatScreen = ({ navigation, route }) => {
   const [isTyping, setIsTyping] = useState(false);
   const scrollViewRef = useRef();
   
-  const { userType, email, name, userPoints } = route.params || {};
+  const { userType, email, name, userPoints = 293 } = route.params || {};
 
   useEffect(() => {
     scrollToBottom();

@@ -34,7 +34,7 @@ const ChatScreen = ({ navigation, route }) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const scrollViewRef = useRef();
   
-  const { userType, email, name, userPoints } = route.params || {};
+  const { userType = 'guest', email = '', name = 'ضيف', userPoints = 293 } = route.params || {};
   const chatId = route?.params?.chatId || 'default';
 
   useEffect(() => {

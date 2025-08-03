@@ -33,26 +33,34 @@ const MainScreen = ({ navigation, route }) => {
     setShowSideMenu(!showSideMenu);
   };
 
+  const handleUpgrade = () => {
+    navigation.navigate('Upgrade', { userPoints, setUserPoints });
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={toggleSideMenu}>
+        <TouchableOpacity onPress={toggleSideMenu} style={styles.headerButton}>
           <Ionicons name="person-circle-outline" size={32} color="#2c2c2c" />
         </TouchableOpacity>
         
-        <TouchableOpacity>
-          <Ionicons name="notifications-outline" size={24} color="#2c2c2c" />
-          <View style={styles.notificationBadge}>
-            <Text style={styles.badgeText}>2</Text>
-          </View>
-        </TouchableOpacity>
+        <View style={styles.headerCenter}>
+          <Text style={styles.logo}>Build X</Text>
+        </View>
         
-        <Text style={styles.logo}>Build X</Text>
-        
-        <TouchableOpacity>
-          <Ionicons name="search-outline" size={24} color="#2c2c2c" />
-        </TouchableOpacity>
+        <View style={styles.headerRight}>
+          <TouchableOpacity style={styles.headerButton}>
+            <Ionicons name="notifications-outline" size={24} color="#2c2c2c" />
+            <View style={styles.notificationBadge}>
+              <Text style={styles.badgeText}>2</Text>
+            </View>
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={styles.headerButton}>
+            <Ionicons name="search-outline" size={24} color="#2c2c2c" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Tabs */}
@@ -91,29 +99,37 @@ const MainScreen = ({ navigation, route }) => {
                 <Text style={styles.pointsValue}>{userPoints}</Text>
               </View>
             </View>
-            <TouchableOpacity style={styles.upgradeButton}>
+            <TouchableOpacity style={styles.upgradeButton} onPress={handleUpgrade}>
               <Text style={styles.upgradeText}>ترقية</Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* Recent Chat Card */}
-        <View style={styles.chatCard}>
-          <View style={styles.chatHeader}>
-            <Text style={styles.chatTime}>PM 1:55</Text>
-            <View style={styles.chatBadge}>
-              <Text style={styles.chatBadgeText}>2</Text>
-            </View>
-          </View>
-          <Text style={styles.chatTitle}>كيفية استخدام أداة بناء APK</Text>
-          <Text style={styles.chatPreview}>
-            لقد وجدت أن GitHub Actions هي خدمة CI/CD ممتازة لبناء ملفا...
-          </Text>
-        </View>
+
 
         {/* Welcome Message */}
         <View style={styles.welcomeContainer}>
+          <Ionicons name="chatbubble-ellipses-outline" size={48} color="#ccc" />
           <Text style={styles.welcomeTitle}>كيف يمكنني مساعدتك؟</Text>
+          <Text style={styles.welcomeSubtitle}>ابدأ محادثة جديدة أو اختر من المواضيع المقترحة</Text>
+          
+          {/* Quick Actions */}
+          <View style={styles.quickActions}>
+            <TouchableOpacity style={styles.quickActionButton} onPress={handleNewChat}>
+              <Ionicons name="chatbubble" size={20} color="#2c2c2c" />
+              <Text style={styles.quickActionText}>محادثة عامة</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={styles.quickActionButton} onPress={handleNewChat}>
+              <Ionicons name="code-slash" size={20} color="#2c2c2c" />
+              <Text style={styles.quickActionText}>مساعدة برمجة</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={styles.quickActionButton} onPress={handleNewChat}>
+              <Ionicons name="school" size={20} color="#2c2c2c" />
+              <Text style={styles.quickActionText}>تعليم</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
 
@@ -162,6 +178,18 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3.84,
     elevation: 5,
+  },
+  headerButton: {
+    padding: 4,
+  },
+  headerCenter: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   logo: {
     fontSize: 24,
@@ -312,11 +340,51 @@ const styles = StyleSheet.create({
   welcomeContainer: {
     alignItems: 'center',
     paddingVertical: 40,
+    paddingHorizontal: 20,
   },
   welcomeTitle: {
     fontSize: 20,
+    fontWeight: 'bold',
     color: '#2c2c2c',
     textAlign: 'center',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  welcomeSubtitle: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 24,
+    lineHeight: 20,
+  },
+  quickActions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 12,
+  },
+  quickActionButton: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+    marginHorizontal: 4,
+  },
+  quickActionText: {
+    fontSize: 14,
+    color: '#2c2c2c',
+    marginLeft: 8,
+    fontWeight: '500',
   },
   newChatButton: {
     position: 'absolute',

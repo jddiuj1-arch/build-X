@@ -122,6 +122,7 @@ const AttachmentMenu = ({ onSelect, onClose }) => {
           </View>
         </View>
       </View>
+      </View>
     </Modal>
   );
 };
