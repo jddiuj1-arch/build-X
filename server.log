@@ -1,0 +1,7 @@
+Starting project at /workspace/project/manus-ai
+Starting Metro Bundler
+The following packages should be updated for best compatibility with the installed expo version:
+  @react-native-async-storage/async-storage@2.2.0 - expected version: 2.1.2
+Your project may not work correctly until you install the expected versions of the packages.
+Waiting on http://localhost:12002
+Logs for your project will appear below.
