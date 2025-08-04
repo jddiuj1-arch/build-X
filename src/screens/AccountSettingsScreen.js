@@ -9,6 +9,8 @@ import {
   StatusBar,
   TextInput,
   Modal,
+  Animated,
+  Vibration,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -27,55 +29,64 @@ const AccountSettingsScreen = ({ navigation, route }) => {
   const [editValue, setEditValue] = useState('');
 
   const handleEditField = (field, currentValue) => {
+    Vibration.vibrate(10);
     setEditField(field);
     setEditValue(currentValue);
     setShowEditModal(true);
   };
 
   const saveEdit = () => {
+    Vibration.vibrate(15);
     setUserInfo(prev => ({
       ...prev,
       [editField]: editValue
     }));
     setShowEditModal(false);
-    Alert.alert('تم', 'تم حفظ التغييرات بنجاح');
+    Alert.alert('تم ✅', 'تم حفظ التغييرات بنجاح');
   };
 
   const changePassword = () => {
+    Vibration.vibrate(10);
     Alert.alert(
-      'تغيير كلمة المرور',
+      '🔐 تغيير كلمة المرور',
       'سيتم إرسال رابط تغيير كلمة المرور إلى بريدك الإلكتروني',
       [
         { text: 'إلغاء', style: 'cancel' },
         {
-          text: 'إرسال',
-          onPress: () => Alert.alert('تم', 'تم إرسال رابط تغيير كلمة المرور')
+          text: 'إرسال 📧',
+          onPress: () => {
+            Vibration.vibrate(20);
+            Alert.alert('تم ✅', 'تم إرسال رابط تغيير كلمة المرور');
+          }
         }
       ]
     );
   };
 
   const deleteAccount = () => {
+    Vibration.vibrate([0, 100, 50, 100]); // اهتزاز تحذيري
     Alert.alert(
-      'حذف الحساب',
+      '⚠️ حذف الحساب',
       'هذا الإجراء لا يمكن التراجع عنه. سيتم حذف جميع بياناتك نهائياً.',
       [
         { text: 'إلغاء', style: 'cancel' },
         {
-          text: 'حذف الحساب',
+          text: '🗑️ حذف الحساب',
           style: 'destructive',
           onPress: () => {
+            Vibration.vibrate([0, 150, 100, 150]);
             Alert.alert(
-              'تأكيد الحذف',
-              'اكتب "حذف" للتأكيد',
+              '🚨 تأكيد الحذف',
+              'هل أنت متأكد تماماً من حذف حسابك؟ لن تتمكن من استرداد بياناتك.',
               [
                 { text: 'إلغاء', style: 'cancel' },
                 {
-                  text: 'تأكيد',
+                  text: '💀 حذف نهائي',
                   style: 'destructive',
                   onPress: () => {
-                    Alert.alert('تم الحذف', 'تم حذف حسابك بنجاح');
-                    navigation.navigate('Login');
+                    Vibration.vibrate(200);
+                    Alert.alert('تم الحذف 💔', 'تم حذف حسابك بنجاح. نأسف لرؤيتك تغادر!');
+                    setTimeout(() => navigation.navigate('Login'), 2000);
                   }
                 }
               ]
@@ -215,25 +226,57 @@ const AccountSettingsScreen = ({ navigation, route }) => {
           <View key={sectionIndex} style={styles.section}>
             <Text style={styles.sectionTitle}>{section.title}</Text>
             <View style={styles.sectionContainer}>
-              {section.items.map((item, itemIndex) => (
-                <TouchableOpacity
-                  key={itemIndex}
-                  style={styles.settingItem}
-                  onPress={item.onPress}
-                  activeOpacity={0.7}
-                >
-                  <View style={styles.settingLeft}>
-                    <View style={styles.iconContainer}>
-                      <Ionicons name={item.icon} size={20} color="#ff6b35" />
-                    </View>
-                    <View style={styles.settingText}>
-                      <Text style={styles.settingTitle}>{item.title}</Text>
-                      <Text style={styles.settingValue}>{item.value}</Text>
-                    </View>
-                  </View>
-                  <Ionicons name="chevron-back" size={16} color="#ccc" />
-                </TouchableOpacity>
-              ))}
+              {section.items.map((item, itemIndex) => {
+                const [scaleValue] = useState(new Animated.Value(1));
+                
+                const handlePress = () => {
+                  Vibration.vibrate(8);
+                  
+                  Animated.sequence([
+                    Animated.timing(scaleValue, {
+                      toValue: 0.97,
+                      duration: 100,
+                      useNativeDriver: true,
+                    }),
+                    Animated.timing(scaleValue, {
+                      toValue: 1,
+                      duration: 100,
+                      useNativeDriver: true,
+                    }),
+                  ]).start();
+                  
+                  if (item.onPress) {
+                    setTimeout(() => item.onPress(), 150);
+                  }
+                };
+
+                return (
+                  <Animated.View
+                    key={itemIndex}
+                    style={[
+                      styles.settingItemContainer,
+                      { transform: [{ scale: scaleValue }] }
+                    ]}
+                  >
+                    <TouchableOpacity
+                      style={styles.settingItem}
+                      onPress={handlePress}
+                      activeOpacity={0.8}
+                    >
+                      <View style={styles.settingLeft}>
+                        <View style={styles.iconContainer}>
+                          <Ionicons name={item.icon} size={22} color="#ff6b35" />
+                        </View>
+                        <View style={styles.settingText}>
+                          <Text style={styles.settingTitle}>{item.title}</Text>
+                          <Text style={styles.settingValue}>{item.value}</Text>
+                        </View>
+                      </View>
+                      <Ionicons name="chevron-back" size={18} color="#ccc" />
+                    </TouchableOpacity>
+                  </Animated.View>
+                );
+              })}
             </View>
           </View>
         ))}
@@ -245,17 +288,18 @@ const AccountSettingsScreen = ({ navigation, route }) => {
             <TouchableOpacity
               style={styles.dangerItem}
               onPress={deleteAccount}
+              activeOpacity={0.8}
             >
               <View style={styles.dangerLeft}>
                 <View style={styles.dangerIcon}>
-                  <Ionicons name="trash-outline" size={20} color="#f44336" />
+                  <Ionicons name="trash-outline" size={22} color="#f44336" />
                 </View>
                 <View style={styles.dangerText}>
-                  <Text style={styles.dangerItemTitle}>حذف الحساب</Text>
-                  <Text style={styles.dangerItemDesc}>حذف نهائي لجميع البيانات</Text>
+                  <Text style={styles.dangerItemTitle}>🗑️ حذف الحساب</Text>
+                  <Text style={styles.dangerItemDesc}>حذف نهائي لجميع البيانات - لا يمكن التراجع</Text>
                 </View>
               </View>
-              <Ionicons name="chevron-back" size={16} color="#f44336" />
+              <Ionicons name="chevron-back" size={18} color="#f44336" />
             </TouchableOpacity>
           </View>
         </View>
@@ -422,14 +466,20 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
+  settingItemContainer: {
+    marginHorizontal: 2,
+    marginVertical: 1,
+  },
   settingItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingHorizontal: 18,
+    paddingVertical: 18,
     borderBottomWidth: 0.5,
     borderBottomColor: '#f0f0f0',
+    backgroundColor: '#fff',
+    borderRadius: 12,
   },
   settingLeft: {
     flexDirection: 'row',
@@ -437,23 +487,29 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: '#fff5f0',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 14,
+    shadowColor: '#ff6b35',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   settingText: {
     flex: 1,
   },
   settingTitle: {
-    fontSize: 16,
+    fontSize: 17,
     color: '#2c2c2c',
-    fontWeight: '500',
+    fontWeight: '600',
     textAlign: 'right',
-    marginBottom: 2,
+    marginBottom: 3,
+    letterSpacing: 0.3,
   },
   settingValue: {
     fontSize: 14,
@@ -464,26 +520,34 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   dangerTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#f44336',
-    marginBottom: 12,
+    marginBottom: 16,
     marginHorizontal: 20,
     textAlign: 'right',
+    letterSpacing: 0.3,
   },
   dangerContainer: {
     backgroundColor: '#fff',
     marginHorizontal: 20,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#ffebee',
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: '#ffcdd2',
+    shadowColor: '#f44336',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   dangerItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+    backgroundColor: '#fff8f8',
+    borderRadius: 14,
   },
   dangerLeft: {
     flexDirection: 'row',
@@ -491,29 +555,36 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   dangerIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: '#ffebee',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 16,
+    shadowColor: '#f44336',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 3,
   },
   dangerText: {
     flex: 1,
   },
   dangerItemTitle: {
-    fontSize: 16,
+    fontSize: 17,
     color: '#f44336',
-    fontWeight: '500',
+    fontWeight: '700',
     textAlign: 'right',
-    marginBottom: 2,
+    marginBottom: 3,
+    letterSpacing: 0.3,
   },
   dangerItemDesc: {
     fontSize: 14,
     color: '#f44336',
-    opacity: 0.7,
+    opacity: 0.8,
     textAlign: 'right',
+    fontWeight: '500',
   },
   bottomSpacing: {
     height: 40,

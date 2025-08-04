@@ -8,6 +8,8 @@ import {
   Switch,
   Alert,
   StatusBar,
+  Animated,
+  Vibration,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -22,10 +24,35 @@ const FeatureLabScreen = ({ navigation }) => {
   });
 
   const toggleFeature = (featureKey) => {
-    setFeatures(prev => ({
-      ...prev,
-      [featureKey]: !prev[featureKey]
-    }));
+    // تأثير الاهتزاز الخفيف
+    Vibration.vibrate(15);
+    
+    setFeatures(prev => {
+      const newValue = !prev[featureKey];
+      
+      // إظهار رسالة تأكيد للميزات المهمة
+      if (featureKey === 'experimentalAI' && newValue) {
+        Alert.alert(
+          'تحذير',
+          'هذه ميزة تجريبية قد تؤثر على أداء التطبيق. هل تريد المتابعة؟',
+          [
+            { text: 'إلغاء', style: 'cancel' },
+            { text: 'تفعيل', onPress: () => {
+              return {
+                ...prev,
+                [featureKey]: newValue
+              };
+            }}
+          ]
+        );
+        return prev; // لا تغير الحالة حتى يؤكد المستخدم
+      }
+      
+      return {
+        ...prev,
+        [featureKey]: newValue
+      };
+    });
   };
 
   const experimentalFeatures = [
@@ -161,34 +188,83 @@ const FeatureLabScreen = ({ navigation }) => {
         <View style={styles.featuresContainer}>
           <Text style={styles.sectionTitle}>الميزات المتاحة</Text>
           
-          {experimentalFeatures.map((feature, index) => (
-            <View key={feature.key} style={styles.featureCard}>
-              <View style={styles.featureHeader}>
-                <View style={styles.featureInfo}>
-                  <View style={styles.featureIconContainer}>
-                    <Ionicons name={feature.icon} size={24} color="#ff6b35" />
-                  </View>
-                  <View style={styles.featureText}>
-                    <View style={styles.featureTitleRow}>
-                      <Text style={styles.featureTitle}>{feature.title}</Text>
-                      <View style={[styles.statusBadge, { backgroundColor: feature.statusColor + '20' }]}>
-                        <Text style={[styles.statusText, { color: feature.statusColor }]}>
-                          {feature.status}
-                        </Text>
-                      </View>
+          {experimentalFeatures.map((feature, index) => {
+            const [scaleValue] = useState(new Animated.Value(1));
+            
+            const handleFeaturePress = () => {
+              Vibration.vibrate(10);
+              
+              Animated.sequence([
+                Animated.timing(scaleValue, {
+                  toValue: 0.98,
+                  duration: 100,
+                  useNativeDriver: true,
+                }),
+                Animated.timing(scaleValue, {
+                  toValue: 1,
+                  duration: 100,
+                  useNativeDriver: true,
+                }),
+              ]).start();
+              
+              handleFeatureToggle(feature.key, feature.title);
+            };
+
+            return (
+              <Animated.View 
+                key={feature.key} 
+                style={[
+                  styles.featureCard,
+                  { transform: [{ scale: scaleValue }] }
+                ]}
+              >
+                <TouchableOpacity 
+                  style={styles.featureHeader}
+                  onPress={handleFeaturePress}
+                  activeOpacity={0.9}
+                >
+                  <View style={styles.featureInfo}>
+                    <View style={[
+                      styles.featureIconContainer,
+                      features[feature.key] && styles.activeIconContainer
+                    ]}>
+                      <Ionicons 
+                        name={feature.icon} 
+                        size={24} 
+                        color={features[feature.key] ? "#fff" : "#ff6b35"} 
+                      />
                     </View>
-                    <Text style={styles.featureDescription}>{feature.description}</Text>
+                    <View style={styles.featureText}>
+                      <View style={styles.featureTitleRow}>
+                        <Text style={[
+                          styles.featureTitle,
+                          features[feature.key] && styles.activeFeatureTitle
+                        ]}>
+                          {feature.title}
+                        </Text>
+                        <View style={[
+                          styles.statusBadge, 
+                          { backgroundColor: feature.statusColor + '20' }
+                        ]}>
+                          <Text style={[styles.statusText, { color: feature.statusColor }]}>
+                            {feature.status}
+                          </Text>
+                        </View>
+                      </View>
+                      <Text style={styles.featureDescription}>{feature.description}</Text>
+                    </View>
                   </View>
-                </View>
-                <Switch
-                  value={features[feature.key]}
-                  onValueChange={() => handleFeatureToggle(feature.key, feature.title)}
-                  trackColor={{ false: '#ccc', true: '#ff6b35' }}
-                  thumbColor={features[feature.key] ? '#fff' : '#f4f3f4'}
-                />
-              </View>
-            </View>
-          ))}
+                  <Switch
+                    value={features[feature.key]}
+                    onValueChange={handleFeaturePress}
+                    trackColor={{ false: '#e0e0e0', true: '#ff6b35' }}
+                    thumbColor={features[feature.key] ? '#fff' : '#f4f3f4'}
+                    style={styles.featureSwitch}
+                  />
+                </TouchableOpacity>
+              </Animated.View>
+            );
+          })}
         </View>
 
         {/* Feedback Section */}
@@ -297,14 +373,16 @@ const styles = StyleSheet.create({
   },
   featureCard: {
     backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
   },
   featureHeader: {
     flexDirection: 'row',
@@ -317,13 +395,25 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   featureIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: '#fff5f0',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 16,
+    shadowColor: '#ff6b35',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+    transition: 'all 0.3s ease',
+  },
+  activeIconContainer: {
+    backgroundColor: '#ff6b35',
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
   featureText: {
     flex: 1,
@@ -335,11 +425,16 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   featureTitle: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '600',
     color: '#2c2c2c',
     textAlign: 'right',
     flex: 1,
+    letterSpacing: 0.3,
+  },
+  activeFeatureTitle: {
+    color: '#ff6b35',
+    fontWeight: '700',
   },
   statusBadge: {
     paddingHorizontal: 8,
@@ -356,6 +451,9 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'right',
     lineHeight: 18,
+  },
+  featureSwitch: {
+    transform: [{ scaleX: 1.1 }, { scaleY: 1.1 }],
   },
   feedbackSection: {
     marginHorizontal: 20,

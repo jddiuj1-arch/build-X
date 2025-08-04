@@ -10,6 +10,8 @@ import {
   Modal,
   Dimensions,
   StatusBar,
+  Animated,
+  Vibration,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -241,6 +243,7 @@ const SettingsScreen = ({ navigation, route }) => {
           subtitle: cacheSize,
           onPress: clearCache,
           showArrow: true,
+          isDestructive: true,
         },
       ]
     },
@@ -279,33 +282,87 @@ const SettingsScreen = ({ navigation, route }) => {
     },
   ];
 
-  const renderSettingItem = (item, index) => (
-    <TouchableOpacity
-      key={index}
-      style={styles.settingItem}
-      onPress={item.onPress}
-      activeOpacity={0.7}
-    >
-      <View style={styles.settingItemLeft}>
-        <View style={styles.iconContainer}>
-          <Ionicons name={item.icon} size={22} color="#ff6b35" />
-        </View>
-        <View style={styles.settingItemText}>
-          <Text style={styles.settingTitle}>{item.title}</Text>
-          {item.subtitle && (
-            <Text style={styles.settingSubtitle}>{item.subtitle}</Text>
-          )}
-        </View>
-      </View>
-      <View style={styles.settingItemRight}>
-        {item.rightComponent || (
-          item.showArrow && (
-            <Ionicons name="chevron-back" size={18} color="#ccc" />
-          )
-        )}
-      </View>
-    </TouchableOpacity>
-  );
+  const renderSettingItem = (item, index) => {
+    const [scaleValue] = useState(new Animated.Value(1));
+    
+    const handlePress = () => {
+      // تأثير الاهتزاز الخفيف
+      Vibration.vibrate(10);
+      
+      // تأثير الضغط
+      Animated.sequence([
+        Animated.timing(scaleValue, {
+          toValue: 0.95,
+          duration: 100,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleValue, {
+          toValue: 1,
+          duration: 100,
+          useNativeDriver: true,
+        }),
+      ]).start();
+      
+      // تنفيذ الوظيفة
+      if (item.onPress) {
+        setTimeout(() => item.onPress(), 150);
+      }
+    };
+
+    return (
+      <Animated.View
+        key={index}
+        style={[
+          styles.settingItemContainer,
+          { transform: [{ scale: scaleValue }] }
+        ]}
+      >
+        <TouchableOpacity
+          style={[
+            styles.settingItem,
+            item.isDestructive && styles.destructiveItem
+          ]}
+          onPress={handlePress}
+          activeOpacity={0.8}
+        >
+          <View style={styles.settingItemLeft}>
+            <View style={[
+              styles.iconContainer,
+              item.isDestructive && styles.destructiveIconContainer
+            ]}>
+              <Ionicons 
+                name={item.icon} 
+                size={22} 
+                color={item.isDestructive ? "#ff4757" : "#ff6b35"} 
+              />
+            </View>
+            <View style={styles.settingItemText}>
+              <Text style={[
+                styles.settingTitle,
+                item.isDestructive && styles.destructiveTitle
+              ]}>
+                {item.title}
+              </Text>
+              {item.subtitle && (
+                <Text style={styles.settingSubtitle}>{item.subtitle}</Text>
+              )}
+            </View>
+          </View>
+          <View style={styles.settingItemRight}>
+            {item.rightComponent || (
+              item.showArrow && (
+                <Ionicons 
+                  name="chevron-back" 
+                  size={18} 
+                  color={item.isDestructive ? "#ff4757" : "#ccc"} 
+                />
+              )
+            )}
+          </View>
+        </TouchableOpacity>
+      </Animated.View>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -449,12 +506,19 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
     paddingTop: 50,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   backButton: {
     padding: 8,
+    borderRadius: 20,
+    backgroundColor: '#f8f9fa',
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#2c2c2c',
   },
@@ -467,16 +531,18 @@ const styles = StyleSheet.create({
   profileCard: {
     backgroundColor: '#fff',
     margin: 20,
-    padding: 20,
-    borderRadius: 16,
+    padding: 24,
+    borderRadius: 20,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 6,
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
   },
   profileInfo: {
     flexDirection: 'row',
@@ -555,21 +621,32 @@ const styles = StyleSheet.create({
   groupContainer: {
     backgroundColor: '#fff',
     marginHorizontal: 20,
-    borderRadius: 12,
+    borderRadius: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: '#f5f5f5',
+  },
+  settingItemContainer: {
+    marginHorizontal: 2,
+    marginVertical: 1,
   },
   settingItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingHorizontal: 18,
+    paddingVertical: 18,
     borderBottomWidth: 0.5,
     borderBottomColor: '#f0f0f0',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+  },
+  destructiveItem: {
+    backgroundColor: '#fff8f8',
   },
   settingItemLeft: {
     flexDirection: 'row',
@@ -577,28 +654,42 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: '#fff5f0',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 14,
+    shadowColor: '#ff6b35',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  destructiveIconContainer: {
+    backgroundColor: '#fff0f0',
+    shadowColor: '#ff4757',
   },
   settingItemText: {
     flex: 1,
   },
   settingTitle: {
-    fontSize: 16,
+    fontSize: 17,
     color: '#2c2c2c',
-    fontWeight: '500',
+    fontWeight: '600',
     textAlign: 'right',
+    letterSpacing: 0.3,
+  },
+  destructiveTitle: {
+    color: '#ff4757',
   },
   settingSubtitle: {
     fontSize: 14,
     color: '#666',
-    marginTop: 2,
+    marginTop: 3,
     textAlign: 'right',
+    opacity: 0.8,
   },
   settingItemRight: {
     marginLeft: 12,
@@ -608,35 +699,42 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     justifyContent: 'flex-end',
   },
   modalContainer: {
     backgroundColor: '#fff',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
     paddingBottom: 40,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 8,
   },
   modalHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 20,
+    padding: 24,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#f0f0f0',
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#2c2c2c',
+    letterSpacing: 0.3,
   },
   modalItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: 24,
+    paddingVertical: 18,
     borderBottomWidth: 0.5,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: '#f5f5f5',
+    backgroundColor: '#fff',
   },
   modalItemFlag: {
     fontSize: 20,
