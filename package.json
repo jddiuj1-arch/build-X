@@ -4,12 +4,24 @@
   "main": "index.js",
   "scripts": {
     "start": "expo start",
+    "start:dev": "expo start --dev-client",
+    "start:tunnel": "expo start --tunnel",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "build:android": "expo run:android",
+    "build:ios": "expo run:ios",
+    "build:web": "expo export:web",
     "build:apk": "./build-apk.sh",
+    "build:apk-local": "./build-apk-local.sh",
     "build:appimage": "./build-appimage.sh",
-    "build:all": "npm run build:apk && npm run build:appimage"
+    "build:electron": "npm run build:web && electron .",
+    "build:all": "npm run build:apk-local && npm run build:appimage",
+    "build:all-platforms": "./build-all-platforms.sh",
+    "dev": "./dev-start.sh",
+    "prebuild": "expo prebuild",
+    "prebuild:clean": "expo prebuild --clean",
+    "help": "cat BUILD_METHODS.md"
   },
   "dependencies": {
     "@expo/metro-runtime": "~5.0.4",
@@ -37,7 +49,9 @@
     "react-navigation": "^5.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "^7.20.0",
+    "@react-native-community/cli": "^13.6.0",
+    "electron": "^28.0.0"
   },
   "private": true
 }

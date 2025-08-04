@@ -35,3 +35,15 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# Build outputs
+*.apk
+*.aab
+*.ipa
+build-x-release.apk
+android/
+ios/
+
+# Electron
+electron-dist/
+out/

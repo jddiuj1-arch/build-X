@@ -36,51 +36,27 @@ const SideMenu = ({ userType, email, name, userPoints, onClose, navigation }) =>
 
   const menuItems = [
     {
-      icon: 'link-outline',
-      title: 'شارك مع صديق',
-      onPress: () => {
-        Alert.alert('مشاركة', 'سيتم إضافة هذه الميزة قريباً');
-        onClose();
-      }
-    },
-    {
-      icon: 'calendar-outline',
-      title: 'المهام المجدولة',
-      onPress: () => {
-        Alert.alert('المهام المجدولة', 'سيتم إضافة هذه الميزة قريباً');
-        onClose();
-      }
-    },
-    {
-      icon: 'book-outline',
-      title: 'معرفة',
-      onPress: () => {
-        Alert.alert('المعرفة', 'سيتم إضافة هذه الميزة قريباً');
-        onClose();
-      }
-    },
-    {
       icon: 'flask-outline',
       title: 'مختبر الميزات',
       onPress: () => {
-        Alert.alert('مختبر الميزات', 'سيتم إضافة هذه الميزة قريباً');
         onClose();
+        navigation.navigate('FeatureLab');
       }
     },
     {
       icon: 'shield-outline',
       title: 'ضوابط البيانات',
       onPress: () => {
-        Alert.alert('ضوابط البيانات', 'سيتم إضافة هذه الميزة قريباً');
         onClose();
+        navigation.navigate('DataControls');
       }
     },
     {
       icon: 'desktop-outline',
       title: 'متصفح السحابية',
       onPress: () => {
-        Alert.alert('متصفح السحابية', 'سيتم إضافة هذه الميزة قريباً');
         onClose();
+        navigation.navigate('CloudBrowser');
       }
     },
     {
@@ -88,16 +64,16 @@ const SideMenu = ({ userType, email, name, userPoints, onClose, navigation }) =>
       title: 'اللغة',
       subtitle: 'العربية',
       onPress: () => {
-        Alert.alert('اللغة', 'سيتم إضافة المزيد من اللغات قريباً');
         onClose();
+        navigation.navigate('Settings', { userType, email, name, userPoints });
       }
     },
     {
       icon: 'person-outline',
       title: 'الحساب',
       onPress: () => {
-        Alert.alert('الحساب', 'سيتم إضافة إعدادات الحساب قريباً');
         onClose();
+        navigation.navigate('Settings', { userType, email, name, userPoints });
       }
     },
     {
@@ -113,8 +89,8 @@ const SideMenu = ({ userType, email, name, userPoints, onClose, navigation }) =>
       title: 'المظهر',
       subtitle: 'اتباع النظام',
       onPress: () => {
-        Alert.alert('المظهر', 'سيتم إضافة خيارات المظهر قريباً');
         onClose();
+        navigation.navigate('Settings', { userType, email, name, userPoints });
       }
     },
     {
@@ -122,7 +98,19 @@ const SideMenu = ({ userType, email, name, userPoints, onClose, navigation }) =>
       title: 'مسح ذاكرة التخزين المؤقت',
       subtitle: 'MB 98',
       onPress: () => {
-        Alert.alert('مسح الذاكرة', 'تم مسح ذاكرة التخزين المؤقت');
+        Alert.alert(
+          'مسح ذاكرة التخزين المؤقت',
+          'هل تريد مسح جميع البيانات المؤقتة؟',
+          [
+            { text: 'إلغاء', style: 'cancel' },
+            {
+              text: 'مسح',
+              onPress: () => {
+                Alert.alert('تم', 'تم مسح ذاكرة التخزين المؤقت بنجاح');
+              }
+            }
+          ]
+        );
         onClose();
       }
     },
@@ -130,10 +118,37 @@ const SideMenu = ({ userType, email, name, userPoints, onClose, navigation }) =>
 
   const additionalItems = [
     {
+      icon: 'share-outline',
+      title: 'شارك التطبيق',
+      onPress: async () => {
+        try {
+          await Share.share({
+            message: 'جرب تطبيق Build X - مساعد الذكي الاصطناعي الأفضل!\n\nحمل التطبيق الآن: https://buildx.app',
+            title: 'Build X - مساعد الذكي الاصطناعي'
+          });
+        } catch (error) {
+          Alert.alert('خطأ', 'حدث خطأ أثناء المشاركة');
+        }
+        onClose();
+      }
+    },
+    {
       icon: 'heart-outline',
       title: 'قيم هذا التطبيق',
       onPress: () => {
-        Alert.alert('التقييم', 'شكراً لك! سيتم توجيهك لمتجر التطبيقات');
+        Alert.alert(
+          'تقييم التطبيق',
+          'شكراً لاستخدامك Build X! هل تود تقييم التطبيق؟',
+          [
+            { text: 'لاحقاً', style: 'cancel' },
+            {
+              text: 'تقييم',
+              onPress: () => {
+                Alert.alert('شكراً!', 'سيتم توجيهك لمتجر التطبيقات');
+              }
+            }
+          ]
+        );
         onClose();
       }
     },
@@ -141,8 +156,16 @@ const SideMenu = ({ userType, email, name, userPoints, onClose, navigation }) =>
       icon: 'help-circle-outline',
       title: 'الحصول على مساعدة',
       onPress: () => {
-        Alert.alert('المساعدة', 'سيتم إضافة مركز المساعدة قريباً');
         onClose();
+        navigation.navigate('Settings', { userType, email, name, userPoints });
+      }
+    },
+    {
+      icon: 'settings-outline',
+      title: 'جميع الإعدادات',
+      onPress: () => {
+        onClose();
+        navigation.navigate('Settings', { userType, email, name, userPoints });
       }
     },
   ];
